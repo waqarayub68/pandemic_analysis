@@ -5,6 +5,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* background-color: #edecf0 !important; */
 }
 
 code {
@@ -15,6 +16,15 @@ code {
 .filters-div {
   border-left: 1px solid;
   height: 800px;
+}
+
+.filters-left-div {
+  border-right: 1px solid;
+  height: 800px;
+}
+
+.justify-center {
+  justify-content: center;
 }
 
 .row {
