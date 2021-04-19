@@ -6,7 +6,7 @@ import { Statistic, Card, Row, Col } from "antd";
 import HighchartsReact from "highcharts-react-official";
 import highchartsMap from "highcharts/modules/map";
 import { getWorld } from "../services/maps";
-// import { getCovidCountries } from "../services/lookup";
+import { getBarStatistics } from "../services/maps";
 const { Option } = Select;
 // import mapDataIE from "@highcharts/map-collection/countries/ie/ie-all.geo.json";
 
@@ -95,44 +95,8 @@ const mapOptions = {
 };
 
 function Maps() {
-  // const [countries, updateCountries] = React.useState([]);
-  const barChartoptions = {
-    chart: {
-      type: "bar",
-    },
-    title: {
-      text: "Effected Countries Death/Confirm Cases",
-    },
-    xAxis: {
-      categories: ["Pakistan", "India", "UK", "China", "USA"],
-      // gridLineWidth: 0,
-    },
-    yAxis: {
-      min: 0,
-      title: {
-        text: "Total Cases Ratio",
-      },
-      gridLineWidth: 0,
-    },
-    legend: {
-      reversed: true,
-    },
-    plotOptions: {
-      series: {
-        stacking: "normal",
-      },
-    },
-    series: [
-      {
-        name: "Confirm Cases",
-        data: [5, 3, 4, 7, 2],
-      },
-      {
-        name: "Death Cases",
-        data: [2, 2, 3, 2, 1],
-      },
-    ],
-  };
+  const [barStats, updateBarStats] = React.useState([]);
+
   const confirmCasesAreaChart = {
     chart: {
       zoomType: "x",
@@ -282,11 +246,11 @@ function Maps() {
   };
 
   React.useEffect(() => {
-    // async function fetchCountries() {
-    //   const results = await getCovidCountries();
-    //   updateCountries(results.countries);
-    // }
-    // fetchCountries();
+    async function fetchCountries() {
+      const results = await getBarStatistics();
+      updateBarStats(results.barStats);
+    }
+    fetchCountries();
 
     getWorld().then((r) => {
       mapOptions.series[0].data = []; //make sure data is empty before  fill
@@ -312,6 +276,65 @@ function Maps() {
       // updating the map options
     });
   }, []);
+  const barChartCountriies = [];
+  const barChartConfirmCases = [];
+  const barChartDeaths = [];
+  barStats.forEach((item) => {
+    barChartCountriies.push(item.Country);
+    barChartConfirmCases.push(Math.log10(item.ConfirmCases));
+    barChartDeaths.push(Math.log10(item.ConfirmDeaths));
+  });
+  const barChartoptions = {
+    chart: {
+      type: "bar",
+      height: 4500,
+      // width: 5000,
+    },
+    title: {
+      text: "Effected Countries Death/Confirm Cases",
+    },
+    xAxis: {
+      categories: barChartCountriies,
+      // min: 0,
+      // scrollbar: {
+      //   enabled: true,
+      // },
+      min: 0,
+      // max: 4,
+    },
+    yAxis: {
+      min: 0,
+      title: {
+        text: "Total Cases Ratio",
+      },
+      gridLineWidth: 0,
+      pointInterval: 1000,
+    },
+    legend: {
+      reversed: true,
+      // y: 100,
+      // x: 100,
+    },
+    plotOptions: {
+      series: {
+        stacking: "normal",
+      },
+      column: { borderWidth: 0 },
+    },
+    // scrollbar: {
+    //   enabled: true,
+    // },
+    series: [
+      {
+        name: "Confirm Cases",
+        data: barChartConfirmCases,
+      },
+      {
+        name: "Death Cases",
+        data: barChartDeaths,
+      },
+    ],
+  };
 
   return (
     <>
