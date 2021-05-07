@@ -10,5 +10,15 @@ export const getWorld = async () => {
 };
 
 export const getBarStatistics = async () => {
-  return get(flaskBaseUrl + "/get-bar-chart-values");
+  return get(
+    flaskBaseUrl + /* "/get-bar-chart-values" */ "/get-dashboard-stats-values"
+  );
+};
+
+export const getConfirmTimeSeriesStatistics = async () => {
+  return get(flaskBaseUrl + "/get-confirm-time-chart-values");
+};
+
+export const getDeathTimeSeriesStatistics = async () => {
+  return get(flaskBaseUrl + "/get-deaths-time-chart-values");
 };
