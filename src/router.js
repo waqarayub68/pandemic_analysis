@@ -1,11 +1,6 @@
-import Layout from './layout/index'
+import Layout from "./layout/index";
 function Maps() {
-    console.log('----------------------- MAPS --------------------');
-    return (
-        <Layout>
-            
-        </Layout>
-    );
-  }
-  
-  export default Maps;
+  return <Layout></Layout>;
+}
+
+export default Maps;

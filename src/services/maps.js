@@ -15,10 +15,12 @@ export const getBarStatistics = async () => {
   );
 };
 
-export const getConfirmTimeSeriesStatistics = async () => {
-  return get(flaskBaseUrl + "/get-confirm-time-chart-values");
+export const getConfirmTimeSeriesStatistics = async (options) => {
+  const queryString = new URLSearchParams(options).toString();
+  return get(flaskBaseUrl + `/get-confirm-time-chart-values?${queryString}`);
 };
 
-export const getDeathTimeSeriesStatistics = async () => {
-  return get(flaskBaseUrl + "/get-deaths-time-chart-values");
+export const getDeathTimeSeriesStatistics = async (options) => {
+  const queryString = new URLSearchParams(options).toString();
+  return get(flaskBaseUrl + `/get-deaths-time-chart-values?${queryString}`);
 };

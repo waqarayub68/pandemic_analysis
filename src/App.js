@@ -35,6 +35,16 @@ const routes = [
     component: loadable(() => import("./pages/comparison")),
     exact: true,
   },
+  {
+    path: "/countries-comparison",
+    component: loadable(() => import("./pages/countries-comparison")),
+    exact: true,
+  },
+  {
+    path: "/overall-summary",
+    component: loadable(() => import("./pages/overall-summary")),
+    exact: true,
+  },
 ];
 
 function App() {
@@ -43,7 +53,7 @@ function App() {
       <BrowserRouter>
         <IndexLayout />
         <Switch>
-          <Route exact path="/" render={() => <Redirect to="/home" />} />
+          <Route exact path="/" render={() => <Redirect to="/maps" />} />
           {routes.map((route) => (
             <Route
               path={route.path}
@@ -54,7 +64,7 @@ function App() {
           ))}
         </Switch>
       </BrowserRouter>
-      <Footer />
+      {/* <Footer /> */}
       {/* </IndexLayout> */}
     </>
   );

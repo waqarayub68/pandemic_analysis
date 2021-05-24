@@ -1,15 +1,16 @@
-import { Select } from "antd";
+import { Select, Tabs } from "antd";
 import React from "react";
-// import { Tabs } from "antd";
-// import Tables from "./statistics-brief/tables";
-// import PandemicGraphs from "./statistics-brief/pandemicGraphs";
 import Highcharts, { map } from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import { getCovidCountries } from "../services/lookup";
 import { getCombineGraphData } from "../services/graphs";
+import { getDailyTimeSeriesConfirmedChartValues } from "../services/daily-time-series";
+import CountryDaily from "./country-daily";
 import { Spin } from "antd";
-// const { TabPane } = Tabs;
+import { DatePicker } from "antd";
 const { Option } = Select;
+const { TabPane } = Tabs;
+
 const getGraphOptions = (combinedGraph) => {
   const x_categories = [];
   const confirmCases = [];
@@ -24,10 +25,7 @@ const getGraphOptions = (combinedGraph) => {
       zoomType: "xy",
     },
     title: {
-      text: "Average Monthly Temperature and Rainfall in Tokyo",
-    },
-    subtitle: {
-      text: "Source: WorldClimate.com",
+      text: "Confirm Cases Vs Death Cases",
     },
     xAxis: [
       {
@@ -146,13 +144,38 @@ function Graphs() {
   const [effectedCountries, updateEffectedCountries] = React.useState([]);
   const [combinedGraph, updateCombineGraphs] = React.useState([]);
   const [spining, updateSpinner] = React.useState(true);
+  const [options, updateOptions] = React.useState({ country: "Afghanistan" });
+  const [confirmSeries, updateConfirmSeries] = React.useState([]);
+  const [deathSeries, updateDeathSeries] = React.useState([]);
   const handleChange = async (value) => {
     updateSpinner(true);
-    const options = {
-      country: value,
-    };
+    options.country = value;
+    const response = await getCombineGraphData(options);
+    const timeSeries = await getDailyTimeSeriesConfirmedChartValues({
+      location: options.country,
+    });
+    updateCombineGraphs(response.combineGraph);
+    updateConfirmSeries(timeSeries.TImeSeriesChart);
+    updateDeathSeries(timeSeries.TimeSeriesDeaths);
+    updateOptions(options);
+    updateSpinner(false);
+  };
+
+  const handleStartDate = async (value) => {
+    updateSpinner(true);
+    options.start_date = value.toISOString().slice(0, 10);
     const response = await getCombineGraphData(options);
     updateCombineGraphs(response.combineGraph);
+    updateOptions(options);
+    updateSpinner(false);
+  };
+
+  const handleEndDate = async (value) => {
+    updateSpinner(true);
+    options.end_date = value.toISOString().slice(0, 10);
+    const response = await getCombineGraphData(options);
+    updateCombineGraphs(response.combineGraph);
+    updateOptions(options);
     updateSpinner(false);
   };
 
@@ -163,13 +186,19 @@ function Graphs() {
         await getCombineGraphData({ country: response.countries[0] }).then(
           (combinedGraphResponse) => {
             updateCombineGraphs(combinedGraphResponse.combineGraph);
-            updateSpinner(false);
+            // updateSpinner(false);
           }
         );
+        await getDailyTimeSeriesConfirmedChartValues({
+          location: response.countries[0],
+        }).then((timeSeries) => {
+          updateConfirmSeries(timeSeries.TImeSeriesChart);
+          updateDeathSeries(timeSeries.TimeSeriesDeaths);
+          updateSpinner(false);
+        });
       });
     })();
   }, []);
-  // console.log(combinedGraph);
 
   const combineGraph = getGraphOptions(combinedGraph);
   const ConfirmCasesOptions = getConfirmCasesOptions(combinedGraph, 1);
@@ -178,33 +207,41 @@ function Graphs() {
     <>
       <Spin spinning={spining}>
         <div className="row row-margin-remove mt-4 h-100">
+          <div className="col-md-12 mt-3 pl-5">
+            <h4>{options.country} COVID Statistics</h4>
+          </div>
           <div className="col-md-9">
-            <div className="row">
-              <div className="col-md-12">
-                <HighchartsReact
-                  highcharts={Highcharts}
-                  options={combineGraph}
+            <Tabs defaultActiveKey="1" /* onChange={callback} */>
+              <TabPane tab="Commulative" key="1">
+                <div className="row">
+                  <div className="col-md-12 mt-5">
+                    <HighchartsReact
+                      highcharts={Highcharts}
+                      options={combineGraph}
+                    />
+                  </div>
+                  <div className="col-md-5">
+                    <HighchartsReact
+                      highcharts={Highcharts}
+                      options={ConfirmCasesOptions}
+                    />
+                  </div>
+                  <div className="col-md-5">
+                    <HighchartsReact
+                      highcharts={Highcharts}
+                      options={DeathCasesOptions}
+                    />
+                  </div>
+                </div>
+              </TabPane>
+              <TabPane tab="Daily" key="2">
+                <CountryDaily
+                  options={options}
+                  confirmSeries={confirmSeries}
+                  deathSeries={deathSeries}
                 />
-              </div>
-              <div className="col-md-5">
-                <HighchartsReact
-                  highcharts={Highcharts}
-                  options={ConfirmCasesOptions}
-                />
-              </div>
-              <div className="col-md-5">
-                <HighchartsReact
-                  highcharts={Highcharts}
-                  options={DeathCasesOptions}
-                />
-              </div>
-              {/* <div className="col-md-5">
-                <HighchartsReact highcharts={Highcharts} options={options} />
-              </div>
-              <div className="col-md-5">
-                <HighchartsReact highcharts={Highcharts} options={options} />
-              </div> */}
-            </div>
+              </TabPane>
+            </Tabs>
           </div>
           <div className="col-md-3 filters-div">
             <h4>Filters:</h4>
@@ -215,7 +252,7 @@ function Graphs() {
               className="w-100"
               onChange={handleChange}
               showSearch
-              value={effectedCountries[0]}
+              value={options.country}
             >
               {effectedCountries.map((country) => (
                 <Option key={country} value={country}>
@@ -226,36 +263,12 @@ function Graphs() {
             <div className="row row-margin-remove mt-3">
               <div className="col-md-6 pl-1 pr-1">
                 <label>From Date:</label>
-                <Select
-                  placeholder="Start Date"
-                  style={{ width: 120 }}
-                  className="w-100"
-                  // onChange={handleChange}
-                >
-                  <Option value="jack">Jack</Option>
-                  <Option value="lucy">Lucy</Option>
-                  <Option value="disabled" disabled>
-                    Disabled
-                  </Option>
-                  <Option value="Yiminghe">yiminghe</Option>
-                </Select>
+                <DatePicker onChange={handleStartDate} />
               </div>
 
               <div className="col-md-6 pl-1 pr-1">
                 <label>To Date:</label>
-                <Select
-                  placeholder="Start Date"
-                  style={{ width: 120 }}
-                  className="w-100"
-                  // onChange={handleChange}
-                >
-                  <Option value="jack">Jack</Option>
-                  <Option value="lucy">Lucy</Option>
-                  <Option value="disabled" disabled>
-                    Disabled
-                  </Option>
-                  <Option value="Yiminghe">yiminghe</Option>
-                </Select>
+                <DatePicker onChange={handleEndDate} />
               </div>
             </div>
           </div>
