@@ -6,12 +6,13 @@ import { getCovidCountries } from "../services/lookup";
 import { getCombineGraphData } from "../services/graphs";
 import { getDailyTimeSeriesConfirmedChartValues } from "../services/daily-time-series";
 import CountryDaily from "./country-daily";
+import SinglePartial from "./partials/single";
 import { Spin } from "antd";
 import { DatePicker } from "antd";
 const { Option } = Select;
 const { TabPane } = Tabs;
 
-const getGraphOptions = (combinedGraph) => {
+const getGraphOptions = (combinedGraph, type) => {
   const x_categories = [];
   const confirmCases = [];
   const deaths = [];
@@ -20,7 +21,9 @@ const getGraphOptions = (combinedGraph) => {
     confirmCases.push(item.Cases);
     deaths.push(item.Deaths);
   });
-  return {
+  let graphOptions = {};
+
+  graphOptions = {
     chart: {
       zoomType: "xy",
     },
@@ -100,6 +103,19 @@ const getGraphOptions = (combinedGraph) => {
       },
     ],
   };
+
+  return graphOptions;
+};
+const prepareData = (combinedGraph) => {
+  const x_categories = [];
+  const confirmCases = [];
+  const deaths = [];
+  combinedGraph.forEach((item) => {
+    x_categories.push(`0${item.month} - ${item.Year}`);
+    confirmCases.push(item.Cases);
+    deaths.push(item.Deaths);
+  });
+  return { deaths: deaths, confirmCases: confirmCases, x_categories };
 };
 const getConfirmCasesOptions = (combinedGraph, type) => {
   const seriesValues = [];
@@ -147,6 +163,7 @@ function Graphs() {
   const [options, updateOptions] = React.useState({ country: "Afghanistan" });
   const [confirmSeries, updateConfirmSeries] = React.useState([]);
   const [deathSeries, updateDeathSeries] = React.useState([]);
+  const [type, updateType] = React.useState(1);
   const handleChange = async (value) => {
     updateSpinner(true);
     options.country = value;
@@ -159,6 +176,10 @@ function Graphs() {
     updateDeathSeries(timeSeries.TimeSeriesDeaths);
     updateOptions(options);
     updateSpinner(false);
+  };
+
+  const handleType = (value) => {
+    updateType(value);
   };
 
   const handleStartDate = async (value) => {
@@ -201,6 +222,7 @@ function Graphs() {
   }, []);
 
   const combineGraph = getGraphOptions(combinedGraph);
+  const preparedData = prepareData(combinedGraph);
   const ConfirmCasesOptions = getConfirmCasesOptions(combinedGraph, 1);
   const DeathCasesOptions = getConfirmCasesOptions(combinedGraph, 2);
   return (
@@ -215,10 +237,14 @@ function Graphs() {
               <TabPane tab="Commulative" key="1">
                 <div className="row">
                   <div className="col-md-12 mt-5">
-                    <HighchartsReact
-                      highcharts={Highcharts}
-                      options={combineGraph}
-                    />
+                    {type === 1 || type === 2 ? (
+                      <SinglePartial preparedData={preparedData} type={type} />
+                    ) : (
+                      <HighchartsReact
+                        highcharts={Highcharts}
+                        options={combineGraph}
+                      />
+                    )}
                   </div>
                   <div className="col-md-5">
                     <HighchartsReact
@@ -245,6 +271,25 @@ function Graphs() {
           </div>
           <div className="col-md-3 filters-div">
             <h4>Filters:</h4>
+            {/* <label className="mt-3">Effected Countries:</label> */}
+            <Select
+              placeholder="Select Type"
+              style={{ width: 120 }}
+              className="w-100"
+              onChange={handleType}
+              showSearch
+              value={type}
+            >
+              <Option key={"1"} value={1}>
+                Confirm Cases
+              </Option>
+              <Option key={"2"} value={2}>
+                Confirm Deaths
+              </Option>
+              <Option key={"3"} value={3}>
+                Confirm Cases and Deaths
+              </Option>
+            </Select>
             <label className="mt-3">Effected Countries:</label>
             <Select
               placeholder="Select Country"

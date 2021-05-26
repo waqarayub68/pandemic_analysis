@@ -33,37 +33,19 @@ const getBubbleOptions = (values) => {
 
     xAxis: {
       gridLineWidth: 1,
+      // type: "logarithmic",
       title: {
         text: "Active",
       },
       labels: {
         format: "{value}",
       },
-      //   plotLines: [
-      //     {
-      //       color: "black",
-      //       dashStyle: "dot",
-      //       width: 2,
-      //       value: 65,
-      //       label: {
-      //         rotation: 0,
-      //         y: 15,
-      //         style: {
-      //           fontStyle: "italic",
-      //         },
-      //         text: "Safe fat intake 65g/day",
-      //       },
-      //       zIndex: 3,
-      //     },
-      //   ],
-      //   accessibility: {
-      //     rangeDescription: "Range: 60 to 100 grams.",
-      //   },
     },
 
     yAxis: {
       startOnTick: false,
       endOnTick: false,
+      // type: "logarithmic",
       title: {
         text: "Deaths",
       },
@@ -71,26 +53,6 @@ const getBubbleOptions = (values) => {
         format: "{value}",
       },
       maxPadding: 0.2,
-      //   plotLines: [
-      //     {
-      //       color: "black",
-      //       dashStyle: "dot",
-      //       width: 2,
-      //       value: 50,
-      //       label: {
-      //         align: "right",
-      //         style: {
-      //           fontStyle: "italic",
-      //         },
-      //         text: "Safe sugar intake 50g/day",
-      //         x: -10,
-      //       },
-      //       zIndex: 3,
-      //     },
-      //   ],
-      //   accessibility: {
-      //     rangeDescription: "Range: 0 to 160 grams.",
-      //   },
     },
 
     tooltip: {
@@ -183,8 +145,10 @@ function OverallSummary() {
       z: item.Population,
       country: item.Country,
       name: item.Country,
+      color: item.ConfirmCases > 10000000 ? "#d9534f" : "#5bc0de",
     });
   });
+  console.log(temp);
   const Continents = _keys(
     _countBy(effectedCountriesSummary, function (effectedCountriesSummary) {
       return effectedCountriesSummary.Continent;
