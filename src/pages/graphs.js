@@ -9,6 +9,7 @@ import CountryDaily from "./country-daily";
 import SinglePartial from "./partials/single";
 import { Spin } from "antd";
 import { DatePicker } from "antd";
+import moment from "moment";
 const { Option } = Select;
 const { TabPane } = Tabs;
 
@@ -38,6 +39,7 @@ const getGraphOptions = (combinedGraph, type) => {
     ],
     yAxis: [
       {
+        gridLineColor: "transparent",
         // Primary yAxis
         labels: {
           format: "{value}",
@@ -160,10 +162,16 @@ function Graphs() {
   const [effectedCountries, updateEffectedCountries] = React.useState([]);
   const [combinedGraph, updateCombineGraphs] = React.useState([]);
   const [spining, updateSpinner] = React.useState(true);
-  const [options, updateOptions] = React.useState({ country: "Afghanistan" });
+  const [options, updateOptions] = React.useState({
+    country: "Afghanistan",
+  });
+  // const [start_date, updateStartDate] = React.useState({
+  //   start_date: moment("2020-02-24"),
+  // });
   const [confirmSeries, updateConfirmSeries] = React.useState([]);
   const [deathSeries, updateDeathSeries] = React.useState([]);
   const [type, updateType] = React.useState(1);
+  const [tab, updateTab] = React.useState(1);
   const handleChange = async (value) => {
     updateSpinner(true);
     options.country = value;
@@ -184,6 +192,7 @@ function Graphs() {
 
   const handleStartDate = async (value) => {
     updateSpinner(true);
+    // updateStartDate(value);
     options.start_date = value.toISOString().slice(0, 10);
     const response = await getCombineGraphData(options);
     updateCombineGraphs(response.combineGraph);
@@ -199,7 +208,9 @@ function Graphs() {
     updateOptions(options);
     updateSpinner(false);
   };
-
+  const changeTab = (value) => {
+    updateTab(value);
+  };
   React.useEffect(() => {
     (async () => {
       await getCovidCountries().then(async (response) => {
@@ -225,6 +236,7 @@ function Graphs() {
   const preparedData = prepareData(combinedGraph);
   const ConfirmCasesOptions = getConfirmCasesOptions(combinedGraph, 1);
   const DeathCasesOptions = getConfirmCasesOptions(combinedGraph, 2);
+
   return (
     <>
       <Spin spinning={spining}>
@@ -232,11 +244,11 @@ function Graphs() {
           <div className="col-md-12 mt-3 pl-5">
             <h4>{options.country} COVID Statistics</h4>
           </div>
-          <div className="col-md-9">
-            <Tabs defaultActiveKey="1" /* onChange={callback} */>
+          <div className="col-md-9 filters-div-border-right">
+            <Tabs defaultActiveKey="1" onChange={changeTab}>
               <TabPane tab="Commulative" key="1">
                 <div className="row">
-                  <div className="col-md-12 mt-5">
+                  <div className="col-md-12">
                     {type === 1 || type === 2 ? (
                       <SinglePartial preparedData={preparedData} type={type} />
                     ) : (
@@ -245,18 +257,23 @@ function Graphs() {
                         options={combineGraph}
                       />
                     )}
-                  </div>
-                  <div className="col-md-5">
-                    <HighchartsReact
-                      highcharts={Highcharts}
-                      options={ConfirmCasesOptions}
-                    />
-                  </div>
-                  <div className="col-md-5">
-                    <HighchartsReact
-                      highcharts={Highcharts}
-                      options={DeathCasesOptions}
-                    />
+                    {type === 3 && (
+                      <div className="row">
+                        <div className="col-md-5">
+                          <HighchartsReact
+                            highcharts={Highcharts}
+                            options={ConfirmCasesOptions}
+                          />
+                        </div>
+
+                        <div className="col-md-5">
+                          <HighchartsReact
+                            highcharts={Highcharts}
+                            options={DeathCasesOptions}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </TabPane>
@@ -269,27 +286,28 @@ function Graphs() {
               </TabPane>
             </Tabs>
           </div>
-          <div className="col-md-3 filters-div">
+          <div className="col-md-3">
             <h4>Filters:</h4>
-            {/* <label className="mt-3">Effected Countries:</label> */}
-            <Select
-              placeholder="Select Type"
-              style={{ width: 120 }}
-              className="w-100"
-              onChange={handleType}
-              showSearch
-              value={type}
-            >
-              <Option key={"1"} value={1}>
-                Confirm Cases
-              </Option>
-              <Option key={"2"} value={2}>
-                Confirm Deaths
-              </Option>
-              <Option key={"3"} value={3}>
-                Confirm Cases and Deaths
-              </Option>
-            </Select>
+            {tab == 1 && (
+              <Select
+                placeholder="Select Type"
+                style={{ width: 120 }}
+                className="w-100"
+                onChange={handleType}
+                showSearch
+                value={type}
+              >
+                <Option key={"1"} value={1}>
+                  Confirm Cases
+                </Option>
+                <Option key={"2"} value={2}>
+                  Confirm Deaths
+                </Option>
+                <Option key={"3"} value={3}>
+                  Confirm Cases and Deaths
+                </Option>
+              </Select>
+            )}
             <label className="mt-3">Effected Countries:</label>
             <Select
               placeholder="Select Country"
@@ -305,17 +323,33 @@ function Graphs() {
                 </Option>
               ))}
             </Select>
-            <div className="row row-margin-remove mt-3">
-              <div className="col-md-6 pl-1 pr-1">
-                <label>From Date:</label>
-                <DatePicker onChange={handleStartDate} />
-              </div>
+            {tab == 1 && (
+              <div className="row row-margin-remove mt-3">
+                <div className="col-md-6 pl-1 pr-1">
+                  <label>From Date:</label>
+                  <DatePicker
+                    disabledDate={(d) =>
+                      !d || d.isAfter("2021-04-26") || d.isBefore("2020-02-24")
+                    }
+                    // defaultValue={moment("2020-02-24")}
+                    defaultPickerValue={moment("2020-02-24")}
+                    onChange={handleStartDate}
+                  />
+                </div>
 
-              <div className="col-md-6 pl-1 pr-1">
-                <label>To Date:</label>
-                <DatePicker onChange={handleEndDate} />
+                <div className="col-md-6 pl-1 pr-1">
+                  <label>To Date:</label>
+                  <DatePicker
+                    disabledDate={(d) =>
+                      !d || d.isAfter("2021-04-26") || d.isBefore("2020-02-24")
+                    }
+                    // defaultValue={moment("2021-04-26")}
+                    defaultPickerValue={moment("2021-04-26")}
+                    onChange={handleEndDate}
+                  />
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </Spin>

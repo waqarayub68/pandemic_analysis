@@ -32,9 +32,6 @@ function SinglePartial(props) {
       },
     },
     yAxis: {
-      title: {
-        text: "Nuclear weapon states",
-      },
       labels: {
         formatter: function () {
           return this.value / 1000 + "k";

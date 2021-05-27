@@ -23,6 +23,12 @@
   font-size: calc(10px + 2vmin);
   color: white;
 }
+.vacc-color {
+  color: #32cd32;
+}
+.vacc-div {
+  margin-top: 50% !important;
+}
 
 .App-link {
   color: #61dafb;

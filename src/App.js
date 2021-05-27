@@ -36,6 +36,11 @@ const routes = [
     exact: true,
   },
   {
+    path: "/vaccination",
+    component: loadable(() => import("./pages/vaccination")),
+    exact: true,
+  },
+  {
     path: "/countries-comparison",
     component: loadable(() => import("./pages/countries-comparison")),
     exact: true,

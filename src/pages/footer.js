@@ -13,7 +13,7 @@ function Footer() {
             <p class="footer-company-name">
               Information Visualization &copy; 2021
             </p>
-            <div class="footer-icons">
+            {/* <div class="footer-icons">
               <a href="#">
                 <i class="fa fa-twitter"></i>
               </a>
@@ -26,7 +26,7 @@ function Footer() {
               <a href="#">
                 <i class="fa fa-github"></i>
               </a>
-            </div>
+            </div> */}
           </div>
 
           <div class="footer-center">

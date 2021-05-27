@@ -84,48 +84,6 @@ const getBubbleOptions = (values) => {
   };
 };
 
-const getPackedBubbleOptions = (bubbleSeries) => {
-  return {
-    chart: {
-      type: "packedbubble",
-      height: "70%",
-    },
-    title: {
-      text: "Carbon emissions around the world (2014)",
-    },
-    tooltip: {
-      useHTML: true,
-      pointFormat: "<b>{point.name}:</b> {point.value}m CO<sub>2</sub>",
-    },
-    plotOptions: {
-      packedbubble: {
-        minSize: "30%",
-        maxSize: "100%",
-        zMin: 0,
-        zMax: 1000,
-        layoutAlgorithm: {
-          splitSeries: false,
-          gravitationalConstant: 0.04,
-        },
-        dataLabels: {
-          enabled: true,
-          format: "{point.name}",
-          filter: {
-            property: "y",
-            operator: ">",
-            value: 250,
-          },
-          style: {
-            color: "black",
-            textOutline: "none",
-            fontWeight: "normal",
-          },
-        },
-      },
-    },
-    series: bubbleSeries,
-  };
-};
 function OverallSummary() {
   const [effectedCountriesSummary, updateEffectedCountriesSummary] =
     React.useState([]);
@@ -173,7 +131,6 @@ function OverallSummary() {
     });
   });
   const bubbleChartOptions = getBubbleOptions(temp);
-  const packedBubbleOptions = getPackedBubbleOptions(bubbleSeries);
   return (
     <>
       <div>

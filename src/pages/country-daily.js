@@ -7,48 +7,33 @@ function CountryDaily(props) {
   const confirmOPtions = {
     chart: {
       renderTo: "container",
-
       zoomType: "x",
-
       spacingRight: 20,
-
-      borderWidth: 1,
-
-      plotBorderWidth: 1,
     },
-
     title: {
-      text: "Confirm Cases",
+      text: "Daily Cases",
     },
-
     xAxis: {
       type: "datetime",
-
       maxZoom: 14 * 24 * 3600000,
-
       title: {
         text: null,
       },
     },
-
     yAxis: {
       title: {
         text: "Cases on Daily Basis",
       },
-
+      gridLineColor: "transparent",
       startOnTick: false,
-
       showFirstLabel: false,
     },
-
     tooltip: {
       shared: true,
     },
-
     legend: {
       enabled: false,
     },
-
     plotOptions: {
       area: {
         fillColor: {
@@ -60,12 +45,9 @@ function CountryDaily(props) {
             [1, "rgba(2,0,0,0)"],
           ],
         },
-
         lineWidth: 1,
-
         marker: {
           enabled: false,
-
           states: {
             hover: {
               enabled: true,
@@ -74,9 +56,7 @@ function CountryDaily(props) {
             },
           },
         },
-
         shadow: false,
-
         states: {
           hover: {
             lineWidth: 1,
@@ -88,13 +68,9 @@ function CountryDaily(props) {
     series: [
       {
         type: "area",
-
         name: "New Cases",
-
         pointInterval: 24 * 3600 * 1000,
-
         pointStart: Date.UTC(2020, 1, 24),
-
         data: confirmSeries,
       },
     ],
@@ -106,14 +82,10 @@ function CountryDaily(props) {
       zoomType: "x",
 
       spacingRight: 20,
-
-      borderWidth: 1,
-
-      plotBorderWidth: 1,
     },
 
     title: {
-      text: "Confirm Deaths",
+      text: "Daily Deaths",
     },
 
     xAxis: {
@@ -129,8 +101,9 @@ function CountryDaily(props) {
     yAxis: {
       title: {
         text: "Deaths on Daily Basis",
+        gridLineColor: "transparent",
       },
-
+      gridLineColor: "transparent",
       startOnTick: false,
 
       showFirstLabel: false,
@@ -196,12 +169,18 @@ function CountryDaily(props) {
   };
   return (
     <>
-      <div>
-        <HighchartsReact highcharts={Highcharts} options={confirmOPtions} />
-        <HighchartsReact
-          highcharts={Highcharts}
-          options={confirmDeathOPtions}
-        />
+      <div className="row">
+        <div className="col-md-5 mr-3">
+          {" "}
+          <HighchartsReact highcharts={Highcharts} options={confirmOPtions} />
+        </div>
+        <div className="col-md-5 ml-3">
+          {" "}
+          <HighchartsReact
+            highcharts={Highcharts}
+            options={confirmDeathOPtions}
+          />
+        </div>
       </div>
     </>
   );

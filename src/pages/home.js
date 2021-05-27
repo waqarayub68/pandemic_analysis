@@ -4,112 +4,150 @@ import React from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import HC_more from "highcharts/highcharts-more.src";
-import { getBubbleStatistics } from "./../services/home";
+import { getSummaryResults } from "../services/overallSummary";
+import Footer from "../pages/footer";
 HC_more(Highcharts);
-function Home() {
-  const [bubbleStats, setBubbleOptions] = React.useState([]);
-  React.useEffect(() => {
-    (async () => {
-      const results = await getBubbleStatistics();
-      setBubbleOptions(results.bubbleStats);
-    })();
-  }, []);
-  const bubbleSeries = [];
-  const Continents = _keys(
-    _countBy(bubbleStats, function (bubbleStats) {
-      return bubbleStats.Continents;
-    })
-  );
-  Continents.forEach((con) => {
-    const countries = _filter(bubbleStats, (bs) => {
-      return con === bs.Continents;
-    });
-    bubbleSeries.push({
-      name: con,
-      data: countries,
-    });
-  });
-
-  const bubbleOption = {
+const getBubbleOptions = (values) => {
+  return {
     chart: {
-      type: "packedbubble",
-      // height: "100%",
-      height: 700,
-      backgroundColor: {
-        linearGradient: { x1: 0, y1: 0, x2: 0, y2: 0 },
-        stops: [
-          [0, "#F5F5EF"],
-          [1, "#F5F5EF"],
-        ],
+      type: "bubble",
+      plotBorderWidth: 1,
+      zoomType: "xy",
+    },
+
+    legend: {
+      enabled: false,
+    },
+
+    title: {
+      text: "Confirm and Deaths Cases",
+    },
+
+    accessibility: {
+      point: {
+        valueDescriptionFormat:
+          "{index}. {point.name}, Confirm: {point.x}, Deaths: {point.y}, Population: {point.z}.",
       },
     },
-    title: {
-      text: "COVID-19 Effected Countries",
+
+    xAxis: {
+      gridLineWidth: 1,
+      gridLineColor: "transparent",
+      // type: "logarithmic",
+      title: {
+        text: "Confirm",
+      },
+      labels: {
+        format: "{value}",
+      },
     },
+
+    yAxis: {
+      startOnTick: false,
+      endOnTick: false,
+      gridLineColor: "transparent",
+      // type: "logarithmic",
+      title: {
+        text: "Deaths",
+      },
+      labels: {
+        format: "{value}",
+      },
+      maxPadding: 0.2,
+    },
+
     tooltip: {
       useHTML: true,
-      pointFormat: "<b>{point.name}:</b> {point.value}",
+      headerFormat: "<table>",
+      pointFormat:
+        '<tr><th colspan="2"><h3>{point.country}</h3></th></tr>' +
+        "<tr><th>Confirm:</th><td>{point.x}</td></tr>" +
+        "<tr><th>Deaths:</th><td>{point.y}</td></tr>" +
+        "<tr><th>Population:</th><td>{point.z}</td></tr>",
+      footerFormat: "</table>",
+      followPointer: true,
     },
+
     plotOptions: {
-      packedbubble: {
-        minSize: "45%",
-        maxSize: "70%",
-        zMin: 0,
-        zMax: 1000,
-        layoutAlgorithm: {
-          gravitationalConstant: 0.05,
-          splitSeries: true,
-          seriesInteraction: false,
-          dragBetweenSeries: true,
-          parentNodeLimit: true,
-        },
+      series: {
         dataLabels: {
           enabled: true,
           format: "{point.name}",
-          filter: {
-            property: "y",
-            operator: ">",
-            value: 250,
-          },
-          style: {
-            color: "black",
-            textOutline: "none",
-            fontWeight: "normal",
-          },
         },
       },
     },
-    series: bubbleSeries,
+
+    series: [
+      {
+        data: values,
+      },
+    ],
   };
+};
+function Home() {
+  const [bubbleStats, setBubbleOptions] = React.useState([]);
+  const [effectedCountriesSummary, updateEffectedCountriesSummary] =
+    React.useState([]);
+  React.useEffect(() => {
+    (async () => {
+      await getSummaryResults().then(async (response) => {
+        updateEffectedCountriesSummary(response.summary);
+      });
+    })();
+  }, []);
+  const temp = [];
+  effectedCountriesSummary.forEach((item) => {
+    temp.push({
+      x: item.ConfirmCases,
+      y: item.ConfirmDeaths,
+      z: item.Population,
+      country: item.Country,
+      name: item.Country,
+      color: item.ConfirmCases > 10000000 ? "#d9534f" : "#5bc0de",
+    });
+  });
+  const bubbleChartOptions = getBubbleOptions(temp);
 
   return (
     <>
       <div className="bg">
         <div className="row">
-          <div className="h-100 d-block col-md-6">
+          <div className="h-100 d-block col-md-4">
             <h1 className="covid-class">COVID-19</h1>
             <p className="covid-p-class">
               The COVID-19 pandemic, also known as the coronavirus pandemic, is
               an ongoing global pandemic of coronavirus disease 2019 (COVID-19)
               caused by severe acute respiratory syndrome coronavirus 2
               (SARS-CoV-2). The virus was first identified in December 2019 in
-              Wuhan, China.
+              Wuhan, China and spread over the world. Data used in this project
+              was from 24-02-2020 and contains the statistics of all countries.
+              The graph also illustrates how much different countries suffers
+              from the COVID Pandemic.
             </p>
+          </div>
+          <div className="h-100 d-block col-md-8">
+            <HighchartsReact
+              highcharts={Highcharts}
+              options={bubbleChartOptions}
+            />
           </div>
         </div>
       </div>
-
+      {/* <div className="d-block text-center w-100 background-color pt-3">
+        <HighchartsReact highcharts={Highcharts} options={bubbleChartOptions} />
+      </div> */}
       <div className="row mt-4 mb-4 pl-5 pr-5">
         <div className="col-md-4">
           <div class="card pl-3">
             <div class="card-body">
               <p class="card-text">
-                COVID is taken from the github repository click the link below
-                to view repository.
+                <a href="https://github.com/owid/covid-19-data" target="_blank">
+                  COVID-19
+                </a>{" "}
+                data is taken from the github repository. This data is from
+                24-02-2020 and contains the world wide statistics of COVID and
+                vaccinations
               </p>
-              <a href="#" target="_blank">
-                View Repository
-              </a>
             </div>
           </div>
         </div>
@@ -117,12 +155,16 @@ function Home() {
           <div class="card pl-3">
             <div class="card-body">
               <p class="card-text">
-                With supporting text below as a natural lead-in to additional
-                content.
+                <a
+                  href="https://www.kaggle.com/imdevskp/comparing-pandemics-epidemics-outbreaks/#data"
+                  target="_blank"
+                >
+                  Data
+                </a>{" "}
+                to compare the impact of COVID with other Pandemics is also
+                used. That data contains the 100 days of deaths and confirms for
+                each pandemic
               </p>
-              <a href="#" target="_blank">
-                View Repository
-              </a>
             </div>
           </div>
         </div>
@@ -141,9 +183,7 @@ function Home() {
         </div>
       </div>
 
-      <div className="d-block text-center w-100 background-color pt-3">
-        <HighchartsReact highcharts={Highcharts} options={bubbleOption} />
-      </div>
+      <Footer />
     </>
   );
 }

@@ -2,6 +2,7 @@ import React from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import { sum as _sum } from "lodash";
+import { Card } from "antd";
 const PandemicGraphs = (props) => {
   console.log(props.start100Days);
   const options = {
@@ -172,26 +173,36 @@ const PandemicGraphs = (props) => {
     <>
       <div className="row">
         <div className="col-md-6">
-          <HighchartsReact
-            highcharts={Highcharts}
-            options={countries_number_options}
-          />
+          <Card>
+            <HighchartsReact
+              highcharts={Highcharts}
+              options={countries_number_options}
+            />
+          </Card>
         </div>
 
         <div className="col-md-6">
-          <HighchartsReact highcharts={Highcharts} options={donut_options} />
+          <Card>
+            <HighchartsReact highcharts={Highcharts} options={donut_options} />
+          </Card>
         </div>
-        <div className="col-md-4">
-          <HighchartsReact highcharts={Highcharts} options={options} />
+        <div className="col-md-4 mt-5">
+          <Card>
+            <HighchartsReact highcharts={Highcharts} options={options} />
+          </Card>
         </div>
-        <div className="col-md-4">
-          <HighchartsReact
-            highcharts={Highcharts}
-            options={optionsDeathGraph}
-          />
+        <div className="col-md-4 mt-5">
+          <Card>
+            <HighchartsReact
+              highcharts={Highcharts}
+              options={optionsDeathGraph}
+            />
+          </Card>
         </div>
-        <div className="col-md-4">
-          <HighchartsReact highcharts={Highcharts} options={stackOptions} />
+        <div className="col-md-4 mt-5">
+          <Card>
+            <HighchartsReact highcharts={Highcharts} options={stackOptions} />
+          </Card>
         </div>
         {/* <div className="col-md-4">
           <HighchartsReact

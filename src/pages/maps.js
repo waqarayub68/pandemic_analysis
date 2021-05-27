@@ -131,7 +131,7 @@ function Maps() {
               (bc) => name === bc.Country
             );
             if (country) {
-              const value = country.ConfirmCases > 0 ? 1 : 0;
+              const value = country.ConfirmCases > 10000000 ? 1 : 2;
               var type = value === 1 ? "COVID-19 Effected" : "Less-Effected";
               var row = i;
               options.series[0].data.push({
@@ -212,7 +212,7 @@ function Maps() {
           var name = mapInfo["properties"]["name"];
           var country = _find(barStats, (bc) => name === bc.Country);
           if (country) {
-            const typeValue = country.ConfirmCases > 0 ? 1 : 2;
+            const typeValue = country.ConfirmCases > 10000000 ? 1 : 2;
             var type = typeValue === 1 ? "COVID-19 Effected" : "Less-Effected";
             var row = i;
             options.series[0].data.push({
@@ -443,7 +443,7 @@ function Maps() {
       },
     ],
   };
-
+  console.log(deathTimeSeries);
   const barChartCountriies = [];
   const barChartConfirmCases = [];
   const barChartDeaths = [];
