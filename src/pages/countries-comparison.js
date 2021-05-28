@@ -26,6 +26,7 @@ const getLineCompareGraph = (data, type) => {
       seriesData.push({
         name: key,
         data: keyyArray,
+        c: groupedData[key][0].Population,
       });
     }
     title = "Confirm Cases";
@@ -39,6 +40,7 @@ const getLineCompareGraph = (data, type) => {
       seriesData.push({
         name: key,
         data: keyyArray,
+        c: groupedData[key][0].Population,
       });
     }
     title = "Deaths";
@@ -173,8 +175,11 @@ function CountriesComparison() {
   let secondCountry = "";
   let deathSum2 = 0;
   let confirmSum2 = 0;
+  let c1Population = 0;
+  let c2population = 0;
   if (comparisonDeathsGraph.series.length > 0) {
     firstCountry = comparisonDeathsGraph.series[0].name;
+    c1Population = comparisonDeathsGraph.series[0].c;
     deathSum1 =
       comparisonDeathsGraph.series[0].data[
         comparisonDeathsGraph.series[0].data.length - 1
@@ -186,6 +191,7 @@ function CountriesComparison() {
     //   comparisonDeathsGraph.series[0].data.forEach((item) => (deathSum1 += item));
     //   comparisonConfirmGraph.series[0].data.forEach((item) => (deathSum1 += item));
     secondCountry = comparisonDeathsGraph.series[1].name;
+    c2population = comparisonDeathsGraph.series[1].c;
     deathSum2 =
       comparisonDeathsGraph.series[1].data[
         comparisonDeathsGraph.series[1].data.length - 1
@@ -214,20 +220,28 @@ function CountriesComparison() {
                     <Divider type="vertical" />
                     <div className="col-md-3">
                       <Card>
-                        <Statistic
-                          title={firstCountry}
-                          value={confirmSum1}
+                        <h5>{firstCountry}</h5>
+                        <small>Total Population: {c1Population}</small>
+                        <br></br>
+                        <small>Confirmed Cases : {confirmSum1}</small>
+                        {/* <Statistic
+                          // title={firstCountry}
+                          value={`${confirmSum1}`}
                           precision={2}
                           valueStyle={{ color: "#3f8600" }}
-                        />
+                        /> */}
                       </Card>
                       <Card className="mt-5">
-                        <Statistic
+                        <h5>{secondCountry}</h5>
+                        <small>Total Population: {c2population}</small>
+                        <br></br>
+                        <small>Confirmed Cases : {confirmSum2}</small>
+                        {/* <Statistic
                           title={secondCountry}
-                          value={confirmSum2}
+                          value={`${confirmSum2} / ${c2population}`}
                           precision={2}
                           valueStyle={{ color: "#3f8600" }}
-                        />
+                        /> */}
                       </Card>
                     </div>
                   </div>
@@ -246,20 +260,28 @@ function CountriesComparison() {
                     <Divider type="vertical" style={{ height: "100%" }} />
                     <div className="col-md-3">
                       <Card>
-                        <Statistic
+                        <h5>{firstCountry}</h5>
+                        <small>Confirmed Cases: {confirmSum1}</small>
+                        <br></br>
+                        <small>Confirmed Deaths: {deathSum1}</small>
+                        {/* <Statistic
                           title={firstCountry}
                           value={deathSum1}
                           precision={2}
                           valueStyle={{ color: "#3f8600" }}
-                        />
+                        /> */}
                       </Card>
                       <Card className="mt-5">
-                        <Statistic
+                        <h5>{secondCountry}</h5>
+                        <small>Confirmed Cases: {confirmSum2}</small>
+                        <br></br>
+                        <small>Confirmed Deaths: {deathSum2}</small>
+                        {/* <Statistic
                           title={secondCountry}
                           value={deathSum2}
                           precision={2}
                           valueStyle={{ color: "#3f8600" }}
-                        />
+                        /> */}
                       </Card>
                     </div>
                   </div>

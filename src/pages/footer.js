@@ -33,7 +33,7 @@ function Footer() {
             <div>
               <i class="fa fa-map-marker"></i>
               <p>
-                <span>137 Cadge Road</span> NR58DD, orwich
+                <span>137 Cadge Road</span> NR58DD, Norwich
               </p>
             </div>
 

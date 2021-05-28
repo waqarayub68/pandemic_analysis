@@ -443,21 +443,24 @@ function Maps() {
       },
     ],
   };
-  console.log(deathTimeSeries);
   const barChartCountriies = [];
   const barChartConfirmCases = [];
   const barChartDeaths = [];
   let totalConfirmCases = 0;
   let totalDeathCases = 0;
+  let totalPopulation = 0;
+  let selectedCountryPopulation = 0;
   let selectedCountryConfirmCases = 0;
   let selectedCountryDeathCases = 0;
   barStats.forEach((item) => {
     if (selectedCountry && item.Country === selectedCountry) {
       selectedCountryConfirmCases += item.ConfirmCases;
       selectedCountryDeathCases += item.ConfirmDeaths;
+      selectedCountryPopulation = item.TotalPopulation;
     } else {
       totalConfirmCases += item.ConfirmCases;
       totalDeathCases += item.ConfirmDeaths;
+      totalPopulation += item.TotalPopulation;
     }
 
     barChartCountriies.push(item.Country);
@@ -569,7 +572,7 @@ function Maps() {
                       block
                       onClick={() => handleClear()}
                     >
-                      Link
+                      Switch to worldwide statistics
                     </Button>
                   )}
                 </div>
@@ -598,6 +601,20 @@ function Maps() {
                         selectedCountry
                           ? selectedCountryDeathCases
                           : totalDeathCases
+                      }
+                      precision={2}
+                      valueStyle={{ color: "#cf1322" }}
+                    />
+                  </Card>
+                </Col>
+                <Col span={24}>
+                  <Card>
+                    <Statistic
+                      title="Total Population"
+                      value={
+                        selectedCountry
+                          ? selectedCountryPopulation
+                          : totalPopulation
                       }
                       precision={2}
                       valueStyle={{ color: "#cf1322" }}

@@ -250,7 +250,11 @@ function Graphs() {
                 <div className="row">
                   <div className="col-md-12">
                     {type === 1 || type === 2 ? (
-                      <SinglePartial preparedData={preparedData} type={type} />
+                      <SinglePartial
+                        preparedData={preparedData}
+                        type={type}
+                        options={options}
+                      />
                     ) : (
                       <HighchartsReact
                         highcharts={Highcharts}
